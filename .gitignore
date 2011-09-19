@@ -2,6 +2,7 @@ target
 dist
 #*#
 .#*
+.idea
 *.log
 *.iml
 *.ipr

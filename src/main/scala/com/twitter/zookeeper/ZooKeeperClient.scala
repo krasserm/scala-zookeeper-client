@@ -1,21 +1,23 @@
 package com.twitter.zookeeper
 
+import java.util.concurrent.CountDownLatch
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.collection.immutable.Set
+
+import net.lag.logging.Logger
+
 import org.apache.zookeeper.{CreateMode, KeeperException, Watcher, WatchedEvent, ZooKeeper}
-import org.apache.zookeeper.data.{ACL, Stat, Id}
+import org.apache.zookeeper.data.Stat
 import org.apache.zookeeper.ZooDefs.Ids
 import org.apache.zookeeper.Watcher.Event.EventType
 import org.apache.zookeeper.Watcher.Event.KeeperState
-import net.lag.logging.Logger
-import net.lag.configgy.ConfigMap
-import java.util.concurrent.{CountDownLatch, TimeUnit}
-import java.util.concurrent.atomic.AtomicBoolean
 
 class ZooKeeperClient(servers: String, sessionTimeout: Int, basePath : String,
                       watcher: Option[ZooKeeperClient => Unit]) {
   private val log = Logger.get
+  log.info("test")
   @volatile private var zk : ZooKeeper = null
   connect()
 
@@ -30,13 +32,6 @@ class ZooKeeperClient(servers: String, sessionTimeout: Int, basePath : String,
 
   def this(servers: String, watcher: ZooKeeperClient => Unit) =
     this(servers, 3000, "", Some(watcher))
-
-  def this(config: ConfigMap, watcher: Option[ZooKeeperClient => Unit]) = {
-    this(config.getString("zookeeper-client.hostlist").get, // Must be set. No sensible default.
-         config.getInt("zookeeper-client.session-timeout", 3000),
-         config.getString("zookeeper-client.base-path", ""),
-         watcher)
-  }
 
   def getHandle() : ZooKeeper = zk
 
